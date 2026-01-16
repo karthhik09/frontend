@@ -1,0 +1,189 @@
+import React, { useState } from 'react';
+import Sidebar from '../components/sidebar';
+import Header from '../components/header';
+import Footer from '../components/footer';
+
+function SettingsPage({ darkMode, setDarkMode, onNavigate, sidebarOpen, setSidebarOpen }) {
+    const [isEditing, setIsEditing] = useState(false);
+    const [editName, setEditName] = useState('Karthik Sai');
+    const [editEmail, setEditEmail] = useState('karthik09@gmail.com');
+    const [editPassword, setEditPassword] = useState('***********');
+
+    const handleSaveProfile = () => {
+        setIsEditing(false);
+        console.log('Profile saved:', { editName, editEmail, editPassword });
+    };
+
+    const handleCancelProfile = () => {
+        setIsEditing(false);
+        setEditName('Karthik Sai');
+        setEditEmail('karthik09@gmail.com');
+        setEditPassword('***********');
+    };
+
+    return (
+        <div className={`min-h-screen flex flex-col ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+            <div className="flex flex-1">
+                <Sidebar
+                    darkMode={darkMode}
+                    sidebarOpen={sidebarOpen}
+                    setSidebarOpen={setSidebarOpen}
+                    currentPage="settings"
+                    onNavigate={(page) => {
+                        // Only close sidebar on mobile (screen width < 1024px)
+                        if (window.innerWidth < 1024) {
+                            setSidebarOpen(false);
+                        }
+                        onNavigate(page);
+                    }}
+                />
+
+                <div className="flex-1 flex flex-col">
+                    <div className="flex-1 p-4 lg:p-8">
+                        <div className="max-w-5xl mx-auto">
+                            <Header
+                                darkMode={darkMode}
+                                setDarkMode={setDarkMode}
+                                sidebarOpen={sidebarOpen}
+                                setSidebarOpen={setSidebarOpen}
+                            />
+
+                            <h1
+                                className={`text-3xl lg:text-4xl font-bold mb-8 lg:mb-12 ${darkMode ? 'text-white' : 'text-gray-800'
+                                    }`}
+                            >
+                                Settings
+                            </h1>
+
+                            <div
+                                className={`max-w-2xl mx-auto ${darkMode ? 'bg-gray-800' : 'bg-white'
+                                    } rounded-xl p-6 lg:p-8 shadow-lg`}
+                            >
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                                    <div>
+                                        <h2
+                                            className={`text-xl lg:text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'
+                                                }`}
+                                        >
+                                            Profile info
+                                        </h2>
+                                        <p
+                                            className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'
+                                                }`}
+                                        >
+                                            Your account information
+                                        </p>
+                                    </div>
+                                    <button
+                                        onClick={() => setIsEditing(!isEditing)}
+                                        className={`px-6 py-2 rounded-lg transition-colors ${darkMode
+                                            ? 'bg-gray-700 text-white hover:bg-gray-600'
+                                            : 'bg-gray-600 text-white hover:bg-gray-700'
+                                            }`}
+                                    >
+                                        Edit
+                                    </button>
+                                </div>
+
+                                <div className="space-y-6">
+                                    <div>
+                                        <label
+                                            className={`block mb-2 text-sm lg:text-base ${darkMode ? 'text-gray-300' : 'text-gray-700'
+                                                }`}
+                                        >
+                                            Name
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={editName}
+                                            onChange={(e) => setEditName(e.target.value)}
+                                            disabled={!isEditing}
+                                            className={`w-full px-4 py-3 rounded-lg transition-all ${darkMode
+                                                ? 'bg-gray-700 text-white'
+                                                : 'bg-gray-100 text-gray-900'
+                                                } ${!isEditing && 'opacity-60 cursor-not-allowed'} ${isEditing && 'focus:outline-none focus:ring-2 focus:ring-blue-500'
+                                                }`}
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label
+                                            className={`block mb-2 text-sm lg:text-base ${darkMode ? 'text-gray-300' : 'text-gray-700'
+                                                }`}
+                                        >
+                                            Email
+                                        </label>
+                                        <input
+                                            type="email"
+                                            value={editEmail}
+                                            onChange={(e) => setEditEmail(e.target.value)}
+                                            disabled={!isEditing}
+                                            className={`w-full px-4 py-3 rounded-lg transition-all ${darkMode
+                                                ? 'bg-gray-700 text-white'
+                                                : 'bg-gray-100 text-gray-900'
+                                                } ${!isEditing && 'opacity-60 cursor-not-allowed'} ${isEditing && 'focus:outline-none focus:ring-2 focus:ring-blue-500'
+                                                }`}
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label
+                                            className={`block mb-2 text-sm lg:text-base ${darkMode ? 'text-gray-300' : 'text-gray-700'
+                                                }`}
+                                        >
+                                            Password
+                                        </label>
+                                        <input
+                                            type="password"
+                                            value={editPassword}
+                                            onChange={(e) => setEditPassword(e.target.value)}
+                                            disabled={!isEditing}
+                                            className={`w-full px-4 py-3 rounded-lg transition-all ${darkMode
+                                                ? 'bg-gray-700 text-white'
+                                                : 'bg-gray-100 text-gray-900'
+                                                } ${!isEditing && 'opacity-60 cursor-not-allowed'} ${isEditing && 'focus:outline-none focus:ring-2 focus:ring-blue-500'
+                                                }`}
+                                        />
+                                    </div>
+                                </div>
+
+                                {isEditing && (
+                                    <div className="flex flex-col sm:flex-row gap-4 mt-8">
+                                        <button
+                                            onClick={handleSaveProfile}
+                                            className={`px-6 py-2 rounded-lg transition-colors ${darkMode
+                                                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                                                : 'bg-gray-600 text-white hover:bg-gray-700'
+                                                }`}
+                                        >
+                                            Save
+                                        </button>
+                                        <button
+                                            onClick={handleCancelProfile}
+                                            className={`px-6 py-2 rounded-lg transition-colors ${darkMode
+                                                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                                                : 'bg-gray-500 text-white hover:bg-gray-600'
+                                                }`}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                )}
+
+                                <div className={`mt-8 pt-6 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                    <p className={`text-sm text-center ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                        Joined ToDo on 1 Jan 2026
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <Footer darkMode={darkMode} />
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default SettingsPage;
