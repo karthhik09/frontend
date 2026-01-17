@@ -6,7 +6,7 @@ function TaskList({ tasks, darkMode, onToggle, onDelete, onUpdate }) {
         return (
             <div className="text-center py-12">
                 <p className={`italic ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    Empty as my motivation on Tuesday 😅.
+                    Empty as my motivation on Tuesday :)
                     <br />
                     Let's start adding stuff!
                 </p>

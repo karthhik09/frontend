@@ -133,8 +133,6 @@ function DashboardPage({ darkMode, setDarkMode, onNavigate, sidebarOpen, setSide
                             <Header
                                 darkMode={darkMode}
                                 setDarkMode={setDarkMode}
-                                sidebarOpen={sidebarOpen}
-                                setSidebarOpen={setSidebarOpen}
                             />
 
                             <h1

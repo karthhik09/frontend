@@ -79,8 +79,6 @@ function SettingsPage({ darkMode, setDarkMode, onNavigate, sidebarOpen, setSideb
                             <Header
                                 darkMode={darkMode}
                                 setDarkMode={setDarkMode}
-                                sidebarOpen={sidebarOpen}
-                                setSidebarOpen={setSidebarOpen}
                             />
 
                             <h1
