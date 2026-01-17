@@ -12,6 +12,13 @@ function DashboardPage({ darkMode, setDarkMode, onNavigate, sidebarOpen, setSide
     const [filter, setFilter] = useState('all');
     const [loading, setLoading] = useState(true);
     const [addingTask, setAddingTask] = useState(false);
+
+    // Reminder fields
+    const [showReminderFields, setShowReminderFields] = useState(false);
+    const [dueDate, setDueDate] = useState('');
+    const [dueTime, setDueTime] = useState('');
+    const [reminderType, setReminderType] = useState('FIFTEEN_MINUTES');
+    const [customReminderMinutes, setCustomReminderMinutes] = useState(30);
     const greeting = useGreeting();
 
     // Fetch tasks from backend on component mount
@@ -42,14 +49,40 @@ function DashboardPage({ darkMode, setDarkMode, onNavigate, sidebarOpen, setSide
             try {
                 setAddingTask(true);
                 console.log('Attempting to add task:', newTask.trim());
-                const task = await tasksAPI.addTask(newTask.trim(), false, currentUser?.userId);
+
+                // Prepare task data with optional reminder fields
+                const taskData = {
+                    title: newTask.trim(),
+                    status: false,
+                    userId: currentUser?.userId
+                };
+
+                // Add reminder fields if due date is set
+                if (dueDate && dueTime) {
+                    const dueDateTimeStr = `${dueDate}T${dueTime}`;
+                    taskData.dueDateTime = dueDateTimeStr;
+                    taskData.reminderType = reminderType;
+                    if (reminderType === 'CUSTOM') {
+                        taskData.customReminderMinutes = customReminderMinutes;
+                    }
+                }
+
+                const task = await tasksAPI.addTask(taskData.title, taskData.status, taskData.userId, taskData.dueDateTime, taskData.reminderType, taskData.customReminderMinutes);
                 console.log('Task added successfully:', task);
+
                 // Add new task to the list
                 setTasks([
                     ...tasks,
                     { id: task.taskId, text: task.title, completed: task.status }
                 ]);
+
+                // Reset form
                 setNewTask('');
+                setDueDate('');
+                setDueTime('');
+                setReminderType('FIFTEEN_MINUTES');
+                setCustomReminderMinutes(30);
+                setShowReminderFields(false);
             } catch (error) {
                 console.error('Error adding task:', error);
                 console.error('Error response:', error.response?.data);
@@ -133,6 +166,7 @@ function DashboardPage({ darkMode, setDarkMode, onNavigate, sidebarOpen, setSide
                             <Header
                                 darkMode={darkMode}
                                 setDarkMode={setDarkMode}
+                                currentUser={currentUser}
                             />
 
                             <h1
@@ -151,27 +185,108 @@ function DashboardPage({ darkMode, setDarkMode, onNavigate, sidebarOpen, setSide
                                 </h2>
 
                                 {/* Add Task Input */}
-                                <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                                    <input
-                                        type="text"
-                                        placeholder="Type your task here.."
-                                        value={newTask}
-                                        onChange={(e) => setNewTask(e.target.value)}
-                                        onKeyPress={(e) => e.key === 'Enter' && !addingTask && addTask()}
-                                        disabled={addingTask}
-                                        className={`flex-1 px-4 py-3 rounded-lg ${darkMode
-                                            ? 'bg-gray-800 text-white placeholder-gray-400 border border-gray-700'
-                                            : 'bg-white text-gray-900 border border-gray-200'
-                                            } focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50`}
-                                    />
-                                    <button
-                                        onClick={addTask}
-                                        disabled={addingTask}
-                                        className="px-6 py-3 text-white font-semibold rounded-lg transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                                        style={{ backgroundColor: '#1F41BB' }}
-                                    >
-                                        {addingTask ? 'Adding...' : '+ Add'}
-                                    </button>
+                                <div className="mb-6">
+                                    <div className="flex flex-col sm:flex-row gap-4">
+                                        <input
+                                            type="text"
+                                            placeholder="Type your task here.."
+                                            value={newTask}
+                                            onChange={(e) => setNewTask(e.target.value)}
+                                            onKeyPress={(e) => e.key === 'Enter' && !addingTask && !showReminderFields && addTask()}
+                                            disabled={addingTask}
+                                            className={`flex-1 px-4 py-3 rounded-lg ${darkMode
+                                                ? 'bg-gray-800 text-white placeholder-gray-400 border border-gray-700'
+                                                : 'bg-white text-gray-900 border border-gray-200'
+                                                } focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50`}
+                                        />
+                                        <button
+                                            onClick={() => setShowReminderFields(!showReminderFields)}
+                                            className={`px-4 py-3 font-semibold rounded-lg transition-all ${darkMode
+                                                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                                                : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                                                }`}
+                                        >
+                                            {showReminderFields ? '−' : '⏰'}
+                                        </button>
+                                        <button
+                                            onClick={addTask}
+                                            disabled={addingTask}
+                                            className="px-6 py-3 text-white font-semibold rounded-lg transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            style={{ backgroundColor: '#1F41BB' }}
+                                        >
+                                            {addingTask ? 'Adding...' : '+ Add'}
+                                        </button>
+                                    </div>
+
+                                    {/* Reminder Fields */}
+                                    {showReminderFields && (
+                                        <div className={`mt-4 p-4 rounded-lg ${darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-gray-50 border border-gray-200'}`}>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                        Due Date
+                                                    </label>
+                                                    <input
+                                                        type="date"
+                                                        value={dueDate}
+                                                        onChange={(e) => setDueDate(e.target.value)}
+                                                        className={`w-full px-3 py-2 rounded-lg ${darkMode
+                                                            ? 'bg-gray-700 text-white border-gray-600'
+                                                            : 'bg-white text-gray-900 border-gray-300'
+                                                            } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                        Due Time
+                                                    </label>
+                                                    <input
+                                                        type="time"
+                                                        value={dueTime}
+                                                        onChange={(e) => setDueTime(e.target.value)}
+                                                        className={`w-full px-3 py-2 rounded-lg ${darkMode
+                                                            ? 'bg-gray-700 text-white border-gray-600'
+                                                            : 'bg-white text-gray-900 border-gray-300'
+                                                            } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                        Remind Me
+                                                    </label>
+                                                    <select
+                                                        value={reminderType}
+                                                        onChange={(e) => setReminderType(e.target.value)}
+                                                        className={`w-full px-3 py-2 rounded-lg ${darkMode
+                                                            ? 'bg-gray-700 text-white border-gray-600'
+                                                            : 'bg-white text-gray-900 border-gray-300'
+                                                            } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                                    >
+                                                        <option value="FIFTEEN_MINUTES">15 minutes before</option>
+                                                        <option value="ONE_HOUR">1 hour before</option>
+                                                        <option value="CUSTOM">Custom</option>
+                                                    </select>
+                                                </div>
+                                                {reminderType === 'CUSTOM' && (
+                                                    <div>
+                                                        <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                            Minutes Before
+                                                        </label>
+                                                        <input
+                                                            type="number"
+                                                            value={customReminderMinutes}
+                                                            onChange={(e) => setCustomReminderMinutes(parseInt(e.target.value))}
+                                                            min="1"
+                                                            className={`w-full px-3 py-2 rounded-lg ${darkMode
+                                                                ? 'bg-gray-700 text-white border-gray-600'
+                                                                : 'bg-white text-gray-900 border-gray-300'
+                                                                } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Filter Tabs */}

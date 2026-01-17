@@ -36,8 +36,21 @@ export const tasksAPI = {
         return response.data;
     },
 
-    addTask: async (title, status = false, userId) => {
-        const response = await api.post(`/tasks?userId=${userId}`, { title, status });
+    addTask: async (title, status = false, userId, dueDateTime = null, reminderType = null, customReminderMinutes = null) => {
+        const taskData = { title, status };
+
+        // Add optional reminder fields if provided
+        if (dueDateTime) {
+            taskData.dueDateTime = dueDateTime;
+        }
+        if (reminderType) {
+            taskData.reminderType = reminderType;
+        }
+        if (customReminderMinutes !== null) {
+            taskData.customReminderMinutes = customReminderMinutes;
+        }
+
+        const response = await api.post(`/tasks?userId=${userId}`, taskData);
         return response.data;
     },
 

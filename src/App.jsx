@@ -3,6 +3,7 @@ import LoginPage from './pages/loginpage';
 import SignupPage from './pages/signuppage';
 import DashboardPage from './pages/dashboard';
 import SettingsPage from './pages/settings';
+import { emailService } from './services/emailservice';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('login');
@@ -11,6 +12,11 @@ function App() {
   // Lift sidebarOpen state to App level to persist across page navigation
   // On mobile (< 1024px), start collapsed to show only icons; on desktop, start expanded
   const [sidebarOpen, setSidebarOpen] = useState(typeof window !== 'undefined' ? window.innerWidth >= 1024 : false);
+
+  // Initialize EmailJS on app mount
+  useEffect(() => {
+    emailService.init();
+  }, []);
 
   // Check for existing user session on mount
   useEffect(() => {
