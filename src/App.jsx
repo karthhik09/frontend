@@ -71,17 +71,28 @@ function App() {
               taskTitle = notification.message;
             }
 
-            // Format the due time as "DD Mon YYYY at hr:min AM/PM"
-            const date = new Date();
-            const day = date.getDate().toString().padStart(2, '0');
-            const month = date.toLocaleString('en-US', { month: 'short' });
-            const year = date.getFullYear();
-            const time = date.toLocaleString('en-US', {
-              hour: 'numeric',
-              minute: '2-digit',
-              hour12: true
-            });
-            const dueTime = `${day} ${month} ${year} at ${time}`;
+            // Fetch task details to get actual due time
+            let dueTime = 'Not specified';
+            try {
+              const taskResponse = await fetch(`https://todo-backend-1fzd.onrender.com/api/tasks?userId=${currentUser.userId}`);
+              const tasks = await taskResponse.json();
+              const task = tasks.find(t => t.taskId === notification.taskId);
+
+              if (task && task.dueDateTime) {
+                const taskDueDate = new Date(task.dueDateTime);
+                const day = taskDueDate.getDate().toString().padStart(2, '0');
+                const month = taskDueDate.toLocaleString('en-US', { month: 'short' });
+                const year = taskDueDate.getFullYear();
+                const time = taskDueDate.toLocaleString('en-US', {
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  hour12: true
+                });
+                dueTime = `${day} ${month} ${year} at ${time}`;
+              }
+            } catch (error) {
+              console.error('Error fetching task details:', error);
+            }
 
             await emailService.sendTaskReminderEmail(
               currentUser.email,
