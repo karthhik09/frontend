@@ -35,7 +35,8 @@ function DashboardPage({ darkMode, setDarkMode, onNavigate, sidebarOpen, setSide
             const mappedTasks = tasksData.map(task => ({
                 id: task.taskId,
                 text: task.title,
-                completed: task.status
+                completed: task.status,
+                dueDateTime: task.dueDateTime
             }));
             setTasks(mappedTasks);
         } catch (error) {
@@ -74,7 +75,7 @@ function DashboardPage({ darkMode, setDarkMode, onNavigate, sidebarOpen, setSide
                 // Add new task to the list
                 setTasks([
                     ...tasks,
-                    { id: task.taskId, text: task.title, completed: task.status }
+                    { id: task.taskId, text: task.title, completed: task.status, dueDateTime: task.dueDateTime }
                 ]);
 
                 // Reset form

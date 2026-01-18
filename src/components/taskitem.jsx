@@ -38,8 +38,8 @@ function TaskItem({ task, darkMode, onToggle, onDelete, onUpdate }) {
                             onChange={(e) => setEditText(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleSave()}
                             className={`flex-1 px-3 py-2 rounded-lg border-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${darkMode
-                                    ? 'bg-gray-700 text-white border-gray-600'
-                                    : 'bg-white text-gray-900 border-gray-300'
+                                ? 'bg-gray-700 text-white border-gray-600'
+                                : 'bg-white text-gray-900 border-gray-300'
                                 }`}
                             autoFocus
                         />
@@ -72,20 +72,34 @@ function TaskItem({ task, darkMode, onToggle, onDelete, onUpdate }) {
                             onChange={() => onToggle(task.id)}
                             className="w-5 h-5 rounded border-gray-300 cursor-pointer"
                         />
-                        <span
-                            className={`${task.completed ? 'line-through opacity-50' : ''} ${darkMode ? 'text-white' : 'text-gray-900'
-                                }`}
-                        >
-                            {task.text}
-                        </span>
+                        <div className="flex-1">
+                            <span
+                                className={`${task.completed ? 'line-through opacity-50' : ''} ${darkMode ? 'text-white' : 'text-gray-900'
+                                    }`}
+                            >
+                                {task.text}
+                            </span>
+                            {task.dueDateTime && (
+                                <div className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    Due: {new Date(task.dueDateTime).toLocaleString('en-US', {
+                                        month: 'short',
+                                        day: 'numeric',
+                                        year: 'numeric',
+                                        hour: 'numeric',
+                                        minute: '2-digit',
+                                        hour12: true
+                                    })}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     <div className="flex space-x-2">
                         <button
                             onClick={() => setIsEditing(true)}
                             className={`p-2 rounded-lg transition-colors ${darkMode
-                                    ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-700'
-                                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                                ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-700'
+                                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                                 }`}
                             aria-label="Edit task"
                         >
@@ -94,8 +108,8 @@ function TaskItem({ task, darkMode, onToggle, onDelete, onUpdate }) {
                         <button
                             onClick={() => onDelete(task.id)}
                             className={`p-2 rounded-lg transition-colors ${darkMode
-                                    ? 'text-gray-400 hover:text-red-400 hover:bg-gray-700'
-                                    : 'text-gray-500 hover:text-red-500 hover:bg-gray-100'
+                                ? 'text-gray-400 hover:text-red-400 hover:bg-gray-700'
+                                : 'text-gray-500 hover:text-red-500 hover:bg-gray-100'
                                 }`}
                             aria-label="Delete task"
                         >
