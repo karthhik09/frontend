@@ -1,9 +1,8 @@
 import emailjs from '@emailjs/browser';
 
 // EmailJS Configuration
-// TODO: Replace these with your actual EmailJS credentials
 const EMAILJS_SERVICE_ID = 'service_na069lq';
-const EMAILJS_TEMPLATE_ID = 'template_9rdrc4h';
+const EMAILJS_TEMPLATE_ID = 'template_lg6yehq';  // Updated to correct template
 const EMAILJS_PUBLIC_KEY = 'hVdUjDvT83Z91H7YU';
 
 export const emailService = {

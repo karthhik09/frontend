@@ -167,7 +167,6 @@ function DashboardPage({ darkMode, setDarkMode, onNavigate, sidebarOpen, setSide
                         <div className="max-w-5xl mx-auto">
                             <Header
                                 darkMode={darkMode}
-                                setDarkMode={setDarkMode}
                                 currentUser={currentUser}
                             />
 
