@@ -81,14 +81,18 @@ function TaskItem({ task, darkMode, onToggle, onDelete, onUpdate }) {
                             </span>
                             {task.dueDateTime && (
                                 <div className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                    Due: {new Date(task.dueDateTime).toLocaleString('en-US', {
-                                        day: '2-digit',
-                                        month: 'short',
-                                        year: 'numeric',
-                                        hour: 'numeric',
-                                        minute: '2-digit',
-                                        hour12: true
-                                    }).replace(',', ' at')}
+                                    Due: {(() => {
+                                        const date = new Date(task.dueDateTime);
+                                        const day = date.getDate().toString().padStart(2, '0');
+                                        const month = date.toLocaleString('en-US', { month: 'short' });
+                                        const year = date.getFullYear();
+                                        const time = date.toLocaleString('en-US', {
+                                            hour: 'numeric',
+                                            minute: '2-digit',
+                                            hour12: true
+                                        });
+                                        return `${day} ${month} ${year} at ${time}`;
+                                    })()}
                                 </div>
                             )}
                         </div>

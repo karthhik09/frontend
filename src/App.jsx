@@ -71,15 +71,17 @@ function App() {
               taskTitle = notification.message;
             }
 
-            // Format the due time
-            const dueTime = new Date().toLocaleString('en-US', {
-              day: '2-digit',
-              month: 'short',
-              year: 'numeric',
+            // Format the due time as "DD Mon YYYY at hr:min AM/PM"
+            const date = new Date();
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = date.toLocaleString('en-US', { month: 'short' });
+            const year = date.getFullYear();
+            const time = date.toLocaleString('en-US', {
               hour: 'numeric',
               minute: '2-digit',
               hour12: true
-            }).replace(',', ' at');
+            });
+            const dueTime = `${day} ${month} ${year} at ${time}`;
 
             await emailService.sendTaskReminderEmail(
               currentUser.email,
