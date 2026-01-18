@@ -40,6 +40,65 @@ function App() {
     }
   }, []);
 
+  // Poll for notifications and send emails
+  useEffect(() => {
+    if (!currentUser?.userId) return;
+
+    const checkAndSendEmails = async () => {
+      try {
+        // Get all notifications
+        const response = await fetch(`https://todo-backend-1fzd.onrender.com/api/notifications?userId=${currentUser.userId}`);
+        const notifications = await response.json();
+
+        // Get list of notifications we've already sent emails for
+        const sentEmails = JSON.parse(localStorage.getItem('sentEmailNotifications') || '[]');
+
+        // Find new notifications that need emails
+        const newNotifications = notifications.filter(n =>
+          !n.isRead && !sentEmails.includes(n.notificationId)
+        );
+
+        // Send email for each new notification
+        for (const notification of newNotifications) {
+          try {
+            // Format the due time from the notification message
+            const dueTime = new Date().toLocaleString('en-US', {
+              hour: 'numeric',
+              minute: 'numeric',
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric'
+            });
+
+            await emailService.sendTaskReminderEmail(
+              currentUser.email,
+              currentUser.name,
+              notification.message,
+              dueTime
+            );
+
+            // Mark as sent
+            sentEmails.push(notification.notificationId);
+            console.log(`Email sent for notification: ${notification.message}`);
+          } catch (error) {
+            console.error('Failed to send email:', error);
+          }
+        }
+
+        // Save updated sent list
+        localStorage.setItem('sentEmailNotifications', JSON.stringify(sentEmails));
+      } catch (error) {
+        console.error('Error checking notifications:', error);
+      }
+    };
+
+    // Check immediately and then every 10 seconds
+    checkAndSendEmails();
+    const interval = setInterval(checkAndSendEmails, 10000);
+
+    return () => clearInterval(interval);
+  }, [currentUser]);
+
   const pageProps = {
     onNavigate: setCurrentPage,
     currentUser,
