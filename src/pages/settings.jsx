@@ -65,7 +65,7 @@ function SettingsPage({ darkMode, setDarkMode, onNavigate, sidebarOpen, setSideb
                     currentPage="settings"
                     currentUser={currentUser}
                     onNavigate={(page) => {
-                        // Only close sidebar on mobile (screen width < 1024px)
+                        // Only close sidebar on mobile
                         if (window.innerWidth < 1024) {
                             setSidebarOpen(false);
                         }

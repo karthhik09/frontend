@@ -1,18 +1,23 @@
+/**
+ * Email Service
+ * Handles email notifications using EmailJS
+ */
+
 import emailjs from '@emailjs/browser';
 
-// EmailJS Configuration
+//EmailJS Configuration
 const EMAILJS_SERVICE_ID = 'service_na069lq';
 const EMAILJS_TEMPLATE_ID = 'template_lg6yehq';
 const EMAILJS_PUBLIC_KEY = 'hVdUjDvT83Z91H7YU';
 
 export const emailService = {
-    // Initialize EmailJS (call this once when app starts)
+    //Initialize EmailJS and calls once when app starts
     init: () => {
         emailjs.init(EMAILJS_PUBLIC_KEY);
         console.log('EmailJS initialized successfully');
     },
 
-    // Send task reminder email
+    //Send task reminder email
     sendTaskReminderEmail: async (userEmail, userName, taskTitle, dueTime) => {
         console.log('\nAttempting to send email...');
         console.log('To:', userEmail);
