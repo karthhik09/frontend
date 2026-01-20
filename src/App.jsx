@@ -57,7 +57,7 @@ function App() {
     setSidebarOpen
   };
 
-  //Render
+  //Pages to display
   return (
     <>
       {currentPage === 'login' && <LoginPage {...pageProps} />}
