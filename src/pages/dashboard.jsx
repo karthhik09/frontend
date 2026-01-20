@@ -5,6 +5,7 @@ import Footer from '../components/footer';
 import TaskList from '../components/tasklist';
 import useGreeting from '../hooks/greetings';
 import { tasksAPI } from '../services/api';
+import { emailService } from '../services/emailservice';
 import { LuAlarmClock } from 'react-icons/lu';
 
 function DashboardPage({ darkMode, setDarkMode, onNavigate, sidebarOpen, setSidebarOpen, currentUser }) {
@@ -65,7 +66,7 @@ function DashboardPage({ darkMode, setDarkMode, onNavigate, sidebarOpen, setSide
                     taskData.dueDateTime = dueDateTimeStr;
                     taskData.reminderType = reminderType;
                     if (reminderType === 'CUSTOM') {
-                        taskData.customReminderMinutes = customReminderMinutes;
+                        taskData.customReminderMinutes = customReminderMinutes || 30;
                     }
                 }
 
@@ -77,6 +78,32 @@ function DashboardPage({ darkMode, setDarkMode, onNavigate, sidebarOpen, setSide
                     ...tasks,
                     { id: task.taskId, text: task.title, completed: task.status, dueDateTime: task.dueDateTime }
                 ]);
+
+                // Send email notification if task has a due date/time
+                if (dueDate && dueTime && currentUser?.email) {
+                    try {
+                        const taskDueDate = new Date(`${dueDate}T${dueTime}`);
+                        const day = taskDueDate.getDate().toString().padStart(2, '0');
+                        const month = taskDueDate.toLocaleString('en-US', { month: 'short' });
+                        const year = taskDueDate.getFullYear();
+                        const time = taskDueDate.toLocaleString('en-US', {
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true
+                        });
+                        const formattedDueTime = `${day} ${month} ${year} at ${time}`;
+
+                        await emailService.sendTaskReminderEmail(
+                            currentUser.email,
+                            currentUser.name || 'User',
+                            task.title,
+                            formattedDueTime
+                        );
+                    } catch (emailError) {
+                        console.error('Failed to send email notification:', emailError);
+                        // Don't fail task creation if email fails
+                    }
+                }
 
                 // Reset form
                 setNewTask('');
@@ -279,7 +306,7 @@ function DashboardPage({ darkMode, setDarkMode, onNavigate, sidebarOpen, setSide
                                                         <input
                                                             type="number"
                                                             value={customReminderMinutes}
-                                                            onChange={(e) => setCustomReminderMinutes(parseInt(e.target.value))}
+                                                            onChange={(e) => setCustomReminderMinutes(parseInt(e.target.value) || 30)}
                                                             min="1"
                                                             className={`w-full px-3 py-2 rounded-lg ${darkMode
                                                                 ? 'bg-gray-700 text-white border-gray-600'
