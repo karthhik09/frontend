@@ -10,10 +10,54 @@ function SignupPage({ onNavigate, setCurrentUser }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [emailError, setEmailError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+
+    // Validation functions
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email) {
+            return 'Email is required';
+        }
+        if (!emailRegex.test(email)) {
+            return 'Please enter a valid email address';
+        }
+        return '';
+    };
+
+    const validatePassword = (password) => {
+        if (!password) {
+            return 'Password is required';
+        }
+        if (password.length < 6) {
+            return 'Password must be at least 6 characters';
+        }
+        if (password.length > 12) {
+            return 'Password must not exceed 12 characters';
+        }
+        if (!/[A-Z]/.test(password)) {
+            return 'Password must contain at least one capital letter';
+        }
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+            return 'Password must contain at least one special character';
+        }
+        return '';
+    };
 
     const handleSignup = async () => {
-        if (!name || !email || !password) {
-            setError('Please fill in all fields');
+        // Validate inputs
+        if (!name) {
+            setError('Name is required');
+            return;
+        }
+
+        const emailValidationError = validateEmail(email);
+        const passwordValidationError = validatePassword(password);
+
+        setEmailError(emailValidationError);
+        setPasswordError(passwordValidationError);
+
+        if (emailValidationError || passwordValidationError) {
             return;
         }
 
@@ -71,24 +115,39 @@ function SignupPage({ onNavigate, setCurrentUser }) {
                                 className="w-full px-6 py-4 mb-6 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base block disabled:opacity-50"
                             />
 
-                            <input
-                                type="email"
-                                placeholder="sample@mail.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                disabled={loading}
-                                className="w-full px-6 py-4 mb-6 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base block disabled:opacity-50"
-                            />
+                            <div className="mb-6">
+                                <input
+                                    type="email"
+                                    placeholder="sample@mail.com"
+                                    value={email}
+                                    onChange={(e) => {
+                                        setEmail(e.target.value);
+                                        setEmailError('');
+                                    }}
+                                    onBlur={() => setEmailError(validateEmail(email))}
+                                    disabled={loading}
+                                    className={`w-full px-6 py-4 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:border-transparent transition-all text-base block disabled:opacity-50 ${emailError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                                        }`}
+                                />
+                                {emailError && (
+                                    <p className="mt-2 text-sm text-red-600">{emailError}</p>
+                                )}
+                            </div>
 
                             <div className="relative">
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     placeholder="Password"
                                     value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
+                                    onChange={(e) => {
+                                        setPassword(e.target.value);
+                                        setPasswordError('');
+                                    }}
+                                    onBlur={() => setPasswordError(validatePassword(password))}
                                     onKeyPress={(e) => e.key === 'Enter' && handleSignup()}
                                     disabled={loading}
-                                    className="w-full px-6 py-4 pr-12 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base block disabled:opacity-50"
+                                    className={`w-full px-6 py-4 pr-12 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:border-transparent transition-all text-base block disabled:opacity-50 ${passwordError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                                        }`}
                                 />
                                 <button
                                     type="button"
@@ -98,6 +157,9 @@ function SignupPage({ onNavigate, setCurrentUser }) {
                                     {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                                 </button>
                             </div>
+                            {passwordError && (
+                                <p className="mt-2 text-sm text-red-600">{passwordError}</p>
+                            )}
                         </div>
 
                         {/* Buttons */}
