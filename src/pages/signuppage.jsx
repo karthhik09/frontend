@@ -66,11 +66,9 @@ function SignupPage({ onNavigate, setCurrentUser }) {
 
         try {
             const user = await authAPI.register(name, email, password);
-            // Store user data in localStorage
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            setCurrentUser(user);
-            // Auto-login after successful registration
-            onNavigate('dashboard');
+            // Redirect to login page after successful registration
+            alert('Account created successfully! Please login with your credentials.');
+            onNavigate('login');
         } catch (err) {
             setError(err.response?.data?.message || 'Registration failed. Please try again.');
         } finally {
