@@ -11,10 +11,9 @@ const EMAILJS_TEMPLATE_ID = 'template_lg6yehq';
 const EMAILJS_PUBLIC_KEY = 'hVdUjDvT83Z91H7YU';
 
 export const emailService = {
-    //Initialize EmailJS and calls once when app starts
+    //Initialize EmailJS
     init: () => {
-        emailjs.init(EMAILJS_PUBLIC_KEY);
-        console.log('EmailJS initialized successfully');
+        console.log('EmailJS is initialised.');
     },
 
     //Send task reminder email
@@ -36,7 +35,8 @@ export const emailService = {
             const response = await emailjs.send(
                 EMAILJS_SERVICE_ID,
                 EMAILJS_TEMPLATE_ID,
-                templateParams
+                templateParams,
+                EMAILJS_PUBLIC_KEY
             );
 
             console.log('Email sent successfully!');
